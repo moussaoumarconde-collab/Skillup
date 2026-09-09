@@ -268,8 +268,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: null, needsEmailConfirmation: false };
       }
 
-      // 4. Si Supabase exige une confirmation par email avant activation
-      return { error: null, needsEmailConfirmation: true };
+      // 4. Si la session n'a pas été fournie immédiatement par signUp, on connecte directement l'utilisateur
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+      if (!signInError && signInData.session) {
+        setUser(signInData.user);
+        setSession(signInData.session);
+        await fetchSupabaseProfile(signInData.user.id);
+        return { error: null, needsEmailConfirmation: false };
+      }
+
+      return { error: null, needsEmailConfirmation: false };
     } catch (err: unknown) {
       const message =
         err instanceof Error

@@ -41,7 +41,6 @@ function InscriptionContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   // Si déjà connecté, redirection immédiate
   React.useEffect(() => {
@@ -92,7 +91,7 @@ function InscriptionContent() {
     }
 
     setIsLoading(true);
-    const { error, needsEmailConfirmation: requiresConfirm } = await signUp(
+    const { error } = await signUp(
       email.trim(),
       password,
       firstName.trim(),
@@ -106,13 +105,7 @@ function InscriptionContent() {
       return;
     }
 
-    // Si Supabase requiert la confirmation d'adresse email
-    if (requiresConfirm) {
-      setNeedsEmailConfirmation(true);
-      return;
-    }
-
-    // Redirection adaptée au rôle choisi (session active)
+    // Redirection immédiate adaptée au rôle choisi (session active)
     const dest = redirectUrl || (roleToSave === 'instructor' ? '/formateur' : '/');
     router.replace(dest);
   };
@@ -298,38 +291,9 @@ function InscriptionContent() {
       )}
 
       {/* ========================================================================= */}
-      {/* ÉTAPE 2 : FORMULAIRE D'INSCRIPTION OU CONFIRMATION EMAIL                  */}
+      {/* ÉTAPE 2 : FORMULAIRE D'INSCRIPTION DIRECT                                  */}
       {/* ========================================================================= */}
-      {step === 2 && needsEmailConfirmation ? (
-        <div className="bg-white rounded-3xl border border-[#F0F2F6] p-6 sm:p-9 shadow-sm space-y-6 max-w-md mx-auto text-center">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#5C4DF5] mx-auto shadow-sm">
-            <Mail className="w-8 h-8" />
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
-              Vérifiez votre boîte mail
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Un e-mail de confirmation vient d’être envoyé à{' '}
-              <span className="font-semibold text-gray-900">{email}</span>.
-            </p>
-            <p className="text-xs text-gray-400">
-              Veuillez cliquer sur le lien contenu dans cet e-mail pour valider votre compte avant de vous connecter.
-            </p>
-          </div>
-
-          <div className="pt-2">
-            <Link
-              href="/connexion"
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
-            >
-              <span>Se connecter</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      ) : step === 2 && (
+      {step === 2 && (
         <div className="bg-white rounded-3xl border border-[#F0F2F6] p-6 sm:p-9 shadow-sm space-y-6 max-w-md mx-auto">
           {/* En-tête avec bouton de retour */}
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
