@@ -2,15 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { TrendingUp, Trophy, ChevronRight, ArrowRight } from 'lucide-react';
+import { TrendingUp, Trophy, ChevronRight, ArrowRight, BookOpen } from 'lucide-react';
 import { ProgressCircle } from '@/components/ui/ProgressCircle';
-import { RankingChart } from '@/components/ui/RankingChart';
-import { currentUser } from '@/data/mockData';
 
 export const PerformanceSection: React.FC = () => {
   return (
     <section className="w-full space-y-3">
-      {/* Header row with "Voir tout >" */}
+      {/* Header row */}
       <div className="flex items-center justify-between px-1">
         <h2 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
           Mes performances
@@ -37,20 +35,16 @@ export const PerformanceSection: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between sm:justify-around gap-4 px-1">
-              <ProgressCircle percentage={currentUser.stats.overallProgress} size={92} strokeWidth={9} />
+              <ProgressCircle percentage={0} size={92} strokeWidth={9} />
 
               <div className="space-y-3">
                 <div>
                   <p className="text-xs text-gray-400">Formations en cours</p>
-                  <p className="text-xl font-extrabold text-gray-900 mt-0.5">
-                    {currentUser.stats.coursesInProgressCount}
-                  </p>
+                  <p className="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Leçons terminées</p>
-                  <p className="text-xl font-extrabold text-gray-900 mt-0.5">
-                    {currentUser.stats.completedLessonsCount}
-                  </p>
+                  <p className="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
                 </div>
               </div>
             </div>
@@ -58,10 +52,10 @@ export const PerformanceSection: React.FC = () => {
 
           <div className="mt-5 pt-3 border-t border-gray-100">
             <Link
-              href="/mes-lecons"
+              href="/formations"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C4DF5] hover:text-[#4B3CE0] group"
             >
-              <span>Voir mes leçons</span>
+              <span>Découvrir une formation</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -77,31 +71,25 @@ export const PerformanceSection: React.FC = () => {
               <h3 className="text-sm font-bold text-gray-900">Mon classement</h3>
             </div>
 
-            <p className="text-xs text-gray-500">Vous êtes dans le</p>
+            <p className="text-xs text-gray-500">Statut actuel</p>
 
-            <div className="flex items-end justify-between gap-2 mt-1">
-              <div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-[#D97706] tracking-tight">
-                  {currentUser.stats.rankPercentile}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  des apprenants cette semaine
-                </p>
-              </div>
-
-              <div className="shrink-0">
-                <RankingChart />
-              </div>
+            <div className="mt-2 space-y-1">
+              <p className="text-lg font-bold text-[#D97706]">
+                En attente d'activité
+              </p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Suivez votre première formation ou complétez un quiz pour apparaître dans le classement hebdomadaire.
+              </p>
             </div>
           </div>
 
           <div className="mt-5 pt-3 border-t border-amber-100/60">
             <Link
-              href="/quiz"
+              href="/formations"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D97706] hover:text-[#B45309] group"
             >
-              <span>Voir le classement</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Commencer à apprendre</span>
             </Link>
           </div>
         </div>

@@ -1,16 +1,48 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
-import { currentUser } from '@/data/mockData';
+import { Search, Bell, Check, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const TopHeader: React.FC = () => {
   const pathname = usePathname();
   const { user, profile, signOut } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const [notifications, setNotifications] = useState([
+    {
+      id: 'notif_1',
+      title: 'Bienvenue sur SkillUp',
+      description: 'Votre espace d’apprentissage est prêt.',
+      time: 'Récemment',
+      read: false,
+    },
+  ]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  // Fermer les notifications lors d'un clic extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const displayName = user
     ? (profile?.first_name || user.user_metadata?.first_name || user.email?.split('@')[0] || 'Apprenant')
@@ -19,11 +51,13 @@ export const TopHeader: React.FC = () => {
   const userRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
   const userRoleLabel = userRole === 'instructor' ? 'Formateur' : 'Élève';
 
-  const avatarUrl =
-    profile?.avatar_url ||
-    (userRole === 'instructor'
-      ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-      : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80');
+  // Initiales réelles de l'utilisateur (zéro photo Unsplash inconnue)
+  const initials =
+    ((profile?.first_name?.[0] || user?.user_metadata?.first_name?.[0] || '') +
+      (profile?.last_name?.[0] || user?.user_metadata?.last_name?.[0] || '')).toUpperCase() ||
+    (user?.email?.slice(0, 2).toUpperCase() || 'SK');
+
+  const avatarUrl = profile?.avatar_url;
 
   const getPageInfo = () => {
     if (pathname === '/') {
@@ -60,6 +94,18 @@ export const TopHeader: React.FC = () => {
       return {
         title: 'Espace Formateur',
         subtitle: 'Préparez vos futurs contenus pédagogiques',
+      };
+    }
+    if (pathname.startsWith('/parametres')) {
+      return {
+        title: 'Paramètres',
+        subtitle: 'Préférences et configuration de votre compte',
+      };
+    }
+    if (pathname.startsWith('/support')) {
+      return {
+        title: 'Aide & Support',
+        subtitle: 'Questions fréquentes et contact avec l’équipe',
       };
     }
     if (pathname.startsWith('/connexion')) {
@@ -115,18 +161,78 @@ export const TopHeader: React.FC = () => {
           </span>
         </div>
 
-        {/* Notifications (Desktop) */}
+        {/* Notifications interactives (Desktop & Mobile) */}
         {user && (
-          <button
-            type="button"
-            className="hidden sm:flex relative w-10 h-10 rounded-xl bg-white border border-[#E5E7EB] items-center justify-center text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors shadow-xs cursor-pointer"
-            title="Notifications"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 bg-[#5C4DF5] text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
-              3
-            </span>
-          </button>
+          <div className="relative" ref={notifRef}>
+            <button
+              type="button"
+              onClick={() => setShowNotifications((prev) => !prev)}
+              className={`relative w-10 h-10 rounded-xl bg-white border items-center justify-center transition-colors shadow-xs cursor-pointer flex ${
+                showNotifications
+                  ? 'border-[#5C4DF5] text-[#5C4DF5]'
+                  : 'border-[#E5E7EB] text-gray-600 hover:text-gray-900 hover:border-gray-300'
+              }`}
+              title="Notifications"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#5C4DF5] text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Menu déroulant des notifications */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-88 bg-white border border-[#F0F2F6] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-900">Notifications</span>
+                    {unreadCount > 0 && (
+                      <span className="text-[10px] font-semibold bg-[#EDE9FE] text-[#5C4DF5] px-2 py-0.5 rounded-full">
+                        {unreadCount} nouvelle{unreadCount > 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllAsRead}
+                      className="text-[11px] font-semibold text-[#5C4DF5] hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <Check className="w-3 h-3" />
+                      Tout marquer lu
+                    </button>
+                  )}
+                </div>
+
+                <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-gray-400">
+                      Aucune notification
+                    </div>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`py-3 px-1 transition-colors ${
+                          !n.read ? 'bg-purple-50/40 rounded-xl' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs font-bold text-gray-800">{n.title}</p>
+                          <span className="text-[10px] text-gray-400">{n.time}</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+                          {n.description}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Auth Section: Utilisateur connecté ou boutons de connexion */}
@@ -138,14 +244,20 @@ export const TopHeader: React.FC = () => {
               title="Consulter mon compte"
             >
               <div className="relative">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-200 relative bg-gray-100">
-                  <Image
-                    src={avatarUrl}
-                    alt={displayName || 'Profil'}
-                    fill
-                    className="object-cover"
-                    sizes="44px"
-                  />
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-200 relative bg-gray-100 flex items-center justify-center">
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={displayName || 'Profil'}
+                      fill
+                      className="object-cover"
+                      sizes="44px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#5C4DF5] to-[#7C6FF6] text-white flex items-center justify-center font-extrabold text-xs sm:text-sm tracking-wider">
+                      {initials}
+                    </div>
+                  )}
                 </div>
               </div>
 

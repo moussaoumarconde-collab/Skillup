@@ -127,21 +127,21 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Card: Passez Premium */}
+      {/* Card: Abonnement Formateur & Tarifs */}
       <div className="bg-[#F8F7FF] border border-[#ECEAFE] rounded-2xl p-4 text-left relative overflow-hidden mt-4">
-        <div className="w-8 h-8 rounded-lg bg-amber-100/70 flex items-center justify-center mb-2.5">
-          <Crown className="w-4 h-4 text-amber-600 fill-amber-500" />
+        <div className="w-8 h-8 rounded-lg bg-purple-100/70 flex items-center justify-center mb-2.5">
+          <Crown className="w-4 h-4 text-[#5C4DF5]" />
         </div>
-        <h4 className="font-bold text-sm text-gray-900">Passez Premium</h4>
+        <h4 className="font-bold text-sm text-gray-900">Espace Formateur</h4>
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Accédez à toutes les formations et obtenez des certificats.
+          Consultez nos formules d'abonnement pour publier vos cours.
         </p>
-        <button
-          type="button"
-          className="mt-3.5 w-full bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+        <Link
+          href="/abonnement"
+          className="mt-3.5 w-full inline-flex items-center justify-center bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
         >
-          Découvrir Premium
-        </button>
+          Voir les tarifs
+        </Link>
       </div>
     </aside>
   );

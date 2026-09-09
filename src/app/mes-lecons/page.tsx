@@ -2,11 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
-import { currentUser, userCoursesProgress } from '@/data/mockData';
+import { BookOpen, CheckCircle2, ArrowRight } from 'lucide-react';
 import { LearningStatsSummary } from '@/components/lessons/LearningStatsSummary';
-import { ResumeHeroCard } from '@/components/lessons/ResumeHeroCard';
 import { ProgressCourseCard } from '@/components/lessons/ProgressCourseCard';
+import type { UserCourseProgress } from '@/data/mockData';
 
 export default function MesLeconsPage() {
   const [activeTab, setActiveTab] = useState<'in_progress' | 'completed'>(
@@ -19,10 +18,13 @@ export default function MesLeconsPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const inProgressList = userCoursesProgress.filter(
+  // Liste réelle de progression (vide pour un nouveau compte)
+  const [userProgress] = useState<UserCourseProgress[]>([]);
+
+  const inProgressList = userProgress.filter(
     (item) => item.status === 'in_progress'
   );
-  const completedList = userCoursesProgress.filter(
+  const completedList = userProgress.filter(
     (item) => item.status === 'completed'
   );
 
@@ -51,7 +53,7 @@ export default function MesLeconsPage() {
         </div>
       )}
 
-      {/* Contexte & Action rapide (Titre "Mes leçons" déjà présent dans le header global) */}
+      {/* Contexte & Action rapide */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-0.5">
         <p className="text-xs sm:text-sm text-gray-500 font-normal leading-relaxed">
           Suivez votre progression et reprenez votre apprentissage là où vous vous êtes arrêté.
@@ -66,32 +68,14 @@ export default function MesLeconsPage() {
         </Link>
       </div>
 
-      {/* 1. Résumé des métriques d'apprentissage */}
+      {/* 1. Résumé des métriques d'apprentissage réelles */}
       <LearningStatsSummary
         inProgressCount={inProgressList.length}
         completedLessonsCount={completedLessonsCount}
         averageProgress={averageProgress}
       />
 
-      {/* 2. Dernière leçon suivie (Hero de reprise) */}
-      {currentUser.lastLesson && (
-        <section className="space-y-2">
-          <h2 className="text-sm sm:text-base font-bold text-gray-900 px-0.5">
-            Dernière leçon
-          </h2>
-          <ResumeHeroCard
-            courseId={currentUser.lastLesson.courseId}
-            courseTitle={currentUser.lastLesson.courseTitle}
-            moduleName={currentUser.lastLesson.moduleName}
-            lessonName={currentUser.lastLesson.lessonName}
-            progressPercentage={currentUser.lastLesson.progressPercentage}
-            thumbnail={currentUser.lastLesson.thumbnail}
-            onToast={showToast}
-          />
-        </section>
-      )}
-
-      {/* 3. Onglets En cours / Terminées */}
+      {/* 2. Onglets En cours / Terminées */}
       <section className="space-y-4 pt-1">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
@@ -128,7 +112,7 @@ export default function MesLeconsPage() {
           </Link>
         </div>
 
-        {/* 4. Liste des cartes de formations */}
+        {/* 3. Liste des cartes de formations */}
         <div className="space-y-3 sm:space-y-3.5">
           {displayedList.length > 0 ? (
             displayedList.map((item) => (
@@ -141,7 +125,7 @@ export default function MesLeconsPage() {
           ) : (
             <div className="bg-white rounded-2xl p-8 sm:p-12 text-center border border-gray-100 shadow-xs space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-purple-50 text-[#5C4DF5] flex items-center justify-center mx-auto">
-                <Sparkles className="w-6 h-6" />
+                <BookOpen className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-gray-900 text-base">
                 Aucune formation {activeTab === 'completed' ? 'terminée pour le moment' : 'en cours'}
