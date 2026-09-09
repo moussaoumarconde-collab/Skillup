@@ -325,6 +325,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       setProfile(null);
       clearLocalSession();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/connexion';
+      }
     }
   };
 
