@@ -12,6 +12,7 @@ import {
   HelpCircle,
   Crown,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   label: string;
@@ -33,6 +34,10 @@ const secondaryNavItems: NavItem[] = [
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const { user, profile } = useAuth();
+
+  const userRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
+  const isInstructor = userRole === 'instructor' || userRole === 'admin';
 
   const isItemActive = (href: string) => {
     if (href === '/') {
@@ -127,22 +132,24 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Card: Abonnement Formateur & Tarifs */}
-      <div className="bg-[#F8F7FF] border border-[#ECEAFE] rounded-2xl p-4 text-left relative overflow-hidden mt-4">
-        <div className="w-8 h-8 rounded-lg bg-purple-100/70 flex items-center justify-center mb-2.5">
-          <Crown className="w-4 h-4 text-[#5C4DF5]" />
+      {/* Card: Abonnement Formateur & Tarifs (affiché uniquement pour les formateurs et admins) */}
+      {isInstructor && (
+        <div className="bg-[#F8F7FF] border border-[#ECEAFE] rounded-2xl p-4 text-left relative overflow-hidden mt-4">
+          <div className="w-8 h-8 rounded-lg bg-purple-100/70 flex items-center justify-center mb-2.5">
+            <Crown className="w-4 h-4 text-[#5C4DF5]" />
+          </div>
+          <h4 className="font-bold text-sm text-gray-900">Espace Formateur</h4>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            Consultez nos formules d'abonnement pour publier vos cours.
+          </p>
+          <Link
+            href="/abonnement"
+            className="mt-3.5 w-full inline-flex items-center justify-center bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+          >
+            Voir les tarifs
+          </Link>
         </div>
-        <h4 className="font-bold text-sm text-gray-900">Espace Formateur</h4>
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Consultez nos formules d'abonnement pour publier vos cours.
-        </p>
-        <Link
-          href="/abonnement"
-          className="mt-3.5 w-full inline-flex items-center justify-center bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
-        >
-          Voir les tarifs
-        </Link>
-      </div>
+      )}
     </aside>
   );
 };
