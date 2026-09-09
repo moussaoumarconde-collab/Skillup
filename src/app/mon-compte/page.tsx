@@ -20,10 +20,16 @@ import {
   Settings,
   HelpCircle,
 } from 'lucide-react';
+import { SubscriptionStatus } from '@/components/subscriptions/SubscriptionStatus';
+import { getInstructorSubscription } from '@/lib/subscriptions';
+import type { InstructorSubscription } from '@/types';
 
 export default function MonComptePage() {
   const router = useRouter();
   const { user, profile, updateProfile, signOut, isLoading } = useAuth();
+
+  const userRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
+  const isInstructor = userRole === 'instructor' || userRole === 'admin';
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -31,12 +37,41 @@ export default function MonComptePage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const [subscription, setSubscription] = useState<InstructorSubscription | null>(null);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState<boolean>(true);
+
   // Redirection côté client si non connecté
   useEffect(() => {
     if (!isLoading && !user) {
       router.replace('/connexion?redirect=/mon-compte');
     }
   }, [user, isLoading, router]);
+
+  // Charger l'abonnement formateur si applicable
+  useEffect(() => {
+    let isMounted = true;
+    if (user?.id && isInstructor) {
+      setIsLoadingSubscription(true);
+      getInstructorSubscription(user.id)
+        .then((sub) => {
+          if (isMounted) {
+            setSubscription(sub);
+            setIsLoadingSubscription(false);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setSubscription(null);
+            setIsLoadingSubscription(false);
+          }
+        });
+    } else {
+      setIsLoadingSubscription(false);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, isInstructor]);
 
   // Initialiser les valeurs du profil
   useEffect(() => {
@@ -123,7 +158,7 @@ export default function MonComptePage() {
                 </h1>
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#5C4DF5] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full">
                   <ShieldCheck className="w-3 h-3" />
-                  {profile?.role === 'instructor' ? '🎓 Formateur' : '👨‍🎓 Élève'}
+                  {isInstructor ? '🎓 Formateur' : '👨‍🎓 Élève'}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1.5">
@@ -247,14 +282,42 @@ export default function MonComptePage() {
         </form>
       </div>
 
-      {/* 3. ACCÈS RAPIDES AUX ACTIONS DU COMPTE */}
+      {/* 3. SECTION ABONNEMENT FORMATEUR (affiché uniquement pour les formateurs) */}
+      {isInstructor && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                Abonnement Formateur
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Gérez votre formule pour publier et monétiser vos formations
+              </p>
+            </div>
+            <Link
+              href="/abonnement"
+              className="text-xs font-semibold text-[#5C4DF5] hover:text-[#4B3CE0] transition-colors"
+            >
+              Voir les formules →
+            </Link>
+          </div>
+
+          <SubscriptionStatus
+            subscription={subscription}
+            isLoading={isLoadingSubscription}
+            showManageButton={true}
+          />
+        </div>
+      )}
+
+      {/* 4. ACCÈS RAPIDES AUX ACTIONS DU COMPTE */}
       <div className="space-y-3">
         <h3 className="text-sm font-bold text-gray-900 px-1">
           Raccourcis d'apprentissage
         </h3>
 
-        <div className={`grid grid-cols-1 ${profile?.role === 'instructor' ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 sm:gap-4`}>
-          {profile?.role === 'instructor' && (
+        <div className={`grid grid-cols-1 ${isInstructor ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 sm:gap-4`}>
+          {isInstructor && (
             <Link
               href="/formateur"
               className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-purple-200 shadow-sm hover:border-[#5C4DF5] transition-all flex items-center gap-3.5 group bg-purple-50/20"
