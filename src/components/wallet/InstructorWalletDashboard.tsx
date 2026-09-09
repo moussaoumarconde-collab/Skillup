@@ -67,11 +67,15 @@ export const InstructorWalletDashboard: React.FC = () => {
           setAccountName(data.payoutAccount.account_name || '');
         }
       } else {
-        setErrorMessage(data.error || 'Erreur lors du chargement des données financières.');
+        const cleanMsg =
+          data.error && !data.error.includes('[') && !data.error.includes('Supabase')
+            ? data.error
+            : 'Impossible de charger les données financières pour le moment.';
+        setErrorMessage(cleanMsg);
       }
     } catch (err) {
       console.error('Erreur chargement wallet:', err);
-      setErrorMessage('Erreur réseau lors de la récupération du portefeuille.');
+      setErrorMessage('Service temporairement indisponible.');
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +142,7 @@ export const InstructorWalletDashboard: React.FC = () => {
         setRetryResult({
           id: txId,
           success: false,
-          msg: data.error || 'Échec de la nouvelle tentative auprès de FedaPay.',
+          msg: data.error || 'Échec de la nouvelle tentative de transfert.',
         });
       }
     } catch (err) {
@@ -257,7 +261,7 @@ export const InstructorWalletDashboard: React.FC = () => {
                   {failedPayoutCount} reversement(s) en attente d’activation
                 </h4>
                 <p className="text-xs text-rose-700 leading-relaxed">
-                  Vos gains sont conservés dans votre solde en attente. Si FedaPay Payout n'est pas encore activé sur votre compte marchand, les fonds restent protégés et pourront être transférés dès activation.
+                  Vos gains sont conservés dans votre solde en attente. Les fonds restent sécurisés et pourront être transférés vers votre compte Mobile Money.
                 </p>
               </div>
             </div>

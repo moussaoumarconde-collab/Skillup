@@ -83,7 +83,11 @@ export default function FormateurPage() {
 
         if (!response.ok) {
           if (isMounted) {
-            setCoursesError(data.error || 'Erreur lors du chargement.');
+            const cleanMsg =
+              data.error && !data.error.includes('[') && !data.error.includes('Supabase')
+                ? data.error
+                : 'Impossible de charger vos formations pour le moment.';
+            setCoursesError(cleanMsg);
             setIsLoadingCourses(false);
           }
           return;

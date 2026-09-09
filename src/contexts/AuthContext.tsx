@@ -257,7 +257,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (!data.user) {
-        return { error: new Error('Échec de la création du compte dans Supabase.') };
+        return { error: new Error('Échec de la création du compte.') };
       }
 
       // 3. Si une session est active immédiatement (confirmation automatique activée)

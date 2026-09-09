@@ -191,8 +191,9 @@ export default function MonComptePage() {
               Modifiez votre prénom et votre nom affichés sur la plateforme
             </p>
           </div>
-          <span className="text-xs font-semibold text-[#5C4DF5] bg-[#F8F7FF] border border-[#ECEAFE] px-3 py-1 rounded-lg hidden sm:block">
-            Supabase RLS sécurisé
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-3 py-1 rounded-xl hidden sm:inline-flex">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Données protégées</span>
           </span>
         </div>
 
