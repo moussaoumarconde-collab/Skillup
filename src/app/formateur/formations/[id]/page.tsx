@@ -84,6 +84,7 @@ export default function EditCoursePage() {
   const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
   const [newLessonTextContent, setNewLessonTextContent] = useState('');
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
+  const [lessonFormError, setLessonFormError] = useState<string | null>(null);
 
   // Edit lesson form
   const [editLessonTitle, setEditLessonTitle] = useState('');
@@ -303,8 +304,12 @@ export default function EditCoursePage() {
 
   // Lesson handlers
   const handleAddLesson = async (moduleId: string) => {
-    if (!newLessonTitle.trim()) return;
+    const targetModule = course?.modules.find((m) => m.id === moduleId);
+    const lessonIndex = (targetModule?.lessons?.length || 0) + 1;
+    const finalTitle = newLessonTitle.trim() || `Leçon ${lessonIndex}`;
+
     setIsCreatingLesson(true);
+    setLessonFormError(null);
     setActionMessage(null);
 
     try {
@@ -312,25 +317,29 @@ export default function EditCoursePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: newLessonTitle.trim(),
+          title: finalTitle,
           content_type: newLessonType,
-          duration: newLessonDuration || '10 min',
-          video_url: newLessonType === 'video' ? newLessonVideoUrl : undefined,
-          text_content: newLessonType === 'text' ? newLessonTextContent : undefined,
+          duration: newLessonDuration.trim() || '10 min',
+          video_url: newLessonType === 'video' ? newLessonVideoUrl.trim() : undefined,
+          text_content: newLessonType === 'text' ? newLessonTextContent.trim() : undefined,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setActionMessage({ type: 'error', text: data.error || 'Erreur.' });
+        const errorMsg =
+          data.error && !data.error.includes('[') && !data.error.includes('Supabase')
+            ? data.error
+            : 'Impossible d’ajouter la leçon pour le moment.';
+        setLessonFormError(errorMsg);
       } else {
         resetNewLessonForm();
-        setActionMessage({ type: 'success', text: 'Leçon ajoutée.' });
+        setActionMessage({ type: 'success', text: 'Leçon ajoutée avec succès !' });
         await loadCourse();
       }
     } catch {
-      setActionMessage({ type: 'error', text: 'Erreur réseau.' });
+      setLessonFormError('Erreur de connexion. Veuillez réessayer.');
     } finally {
       setIsCreatingLesson(false);
     }
@@ -343,6 +352,7 @@ export default function EditCoursePage() {
     setNewLessonDuration('10 min');
     setNewLessonVideoUrl('');
     setNewLessonTextContent('');
+    setLessonFormError(null);
   };
 
   const startEditLesson = (lesson: DbCourseLesson) => {
@@ -820,33 +830,85 @@ export default function EditCoursePage() {
 
                       {/* Add lesson form for this module */}
                       {addingLessonModuleId === mod.id ? (
-                        <div className="px-4 py-3 bg-gray-50/50 space-y-2">
-                          <input type="text" value={newLessonTitle} onChange={(e) => setNewLessonTitle(e.target.value)} placeholder="Titre de la leçon"
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 focus:border-[#5C4DF5]" autoFocus />
+                        <div className="px-4 py-3 bg-gray-50/70 rounded-b-xl space-y-2.5 border-t border-gray-100">
+                          {lessonFormError && (
+                            <div className="text-xs bg-red-50 text-red-700 border border-red-100 px-3 py-2 rounded-xl flex items-center gap-2">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500" />
+                              <span>{lessonFormError}</span>
+                            </div>
+                          )}
+                          <input
+                            type="text"
+                            value={newLessonTitle}
+                            onChange={(e) => {
+                              setNewLessonTitle(e.target.value);
+                              if (lessonFormError) setLessonFormError(null);
+                            }}
+                            placeholder={`Titre de la leçon (optionnel, par défaut : Leçon ${(mod.lessons?.length || 0) + 1})`}
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 focus:border-[#5C4DF5] bg-white transition-all"
+                            autoFocus
+                          />
                           <div className="grid grid-cols-2 gap-2">
-                            <select value={newLessonType} onChange={(e) => setNewLessonType(e.target.value as 'video' | 'text')}
-                              className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white cursor-pointer">
+                            <select
+                              value={newLessonType}
+                              onChange={(e) => setNewLessonType(e.target.value as 'video' | 'text')}
+                              className="border border-gray-200 rounded-xl px-2.5 py-2 text-xs bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20"
+                            >
                               <option value="video">Vidéo</option>
                               <option value="text">Texte</option>
                             </select>
-                            <input type="text" value={newLessonDuration} onChange={(e) => setNewLessonDuration(e.target.value)} placeholder="Durée"
-                              className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20" />
+                            <input
+                              type="text"
+                              value={newLessonDuration}
+                              onChange={(e) => setNewLessonDuration(e.target.value)}
+                              placeholder="Durée (ex: 10 min)"
+                              className="border border-gray-200 rounded-xl px-2.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 bg-white"
+                            />
                           </div>
                           {newLessonType === 'video' ? (
-                            <input type="text" value={newLessonVideoUrl} onChange={(e) => setNewLessonVideoUrl(e.target.value)} placeholder="URL vidéo"
-                              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20" />
+                            <input
+                              type="text"
+                              value={newLessonVideoUrl}
+                              onChange={(e) => {
+                                setNewLessonVideoUrl(e.target.value);
+                                if (lessonFormError) setLessonFormError(null);
+                              }}
+                              placeholder="URL de la vidéo (YouTube, Vimeo, lien MP4 direct...)"
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 focus:border-[#5C4DF5] bg-white transition-all"
+                            />
                           ) : (
-                            <textarea rows={3} value={newLessonTextContent} onChange={(e) => setNewLessonTextContent(e.target.value)} placeholder="Contenu texte"
-                              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 resize-y" />
+                            <textarea
+                              rows={3}
+                              value={newLessonTextContent}
+                              onChange={(e) => setNewLessonTextContent(e.target.value)}
+                              placeholder="Contenu textuel de la leçon..."
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 resize-y bg-white"
+                            />
                           )}
-                          <div className="flex gap-2">
-                            <button type="button" onClick={() => handleAddLesson(mod.id)} disabled={isCreatingLesson}
-                              className="inline-flex items-center gap-1 bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg cursor-pointer disabled:opacity-60">
-                              {isCreatingLesson ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
-                              Ajouter
+                          <div className="flex items-center gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleAddLesson(mod.id)}
+                              disabled={isCreatingLesson}
+                              className="inline-flex items-center justify-center gap-1.5 bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-60"
+                            >
+                              {isCreatingLesson ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>Ajout en cours...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>Ajouter</span>
+                                </>
+                              )}
                             </button>
-                            <button type="button" onClick={resetNewLessonForm}
-                              className="text-[11px] text-gray-500 hover:text-gray-700 font-medium cursor-pointer">
+                            <button
+                              type="button"
+                              onClick={resetNewLessonForm}
+                              className="text-xs text-gray-500 hover:text-gray-800 font-medium px-3 py-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                            >
                               Annuler
                             </button>
                           </div>
