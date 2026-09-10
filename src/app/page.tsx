@@ -1,11 +1,23 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Compass, ChevronRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { LandingPage } from '@/components/landing/LandingPage';
 import { FeaturedCarousel } from '@/components/home/FeaturedCarousel';
 import { PerformanceSection } from '@/components/home/PerformanceSection';
 import { ResumeLessonCard } from '@/components/home/ResumeLessonCard';
 
 export default function HomePage() {
+  const { user, isLoading } = useAuth();
+
+  // Si le visiteur n'est pas connecté, afficher la Landing Page officielle
+  if (!isLoading && !user) {
+    return <LandingPage />;
+  }
+
+  // Si l'utilisateur est connecté, afficher le flux d'accueil de l'application
   return (
     <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 py-2 sm:py-4">
       {/* 1. & 2. & 3. & 4. EN VEDETTE + CARROUSEL + INDICATEURS */}

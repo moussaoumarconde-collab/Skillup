@@ -51,3 +51,18 @@
   border-color: #E2E8F0;
   box-shadow: 0 4px 20px -2px rgba(92, 77, 245, 0.05);
 }
+
+/* Animation sobre de flottement vertical pour le mockup landing page */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 5s ease-in-out infinite;
+}
+
