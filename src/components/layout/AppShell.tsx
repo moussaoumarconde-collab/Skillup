@@ -17,7 +17,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
 
   // Pages autonomes plein écran (Landing page et Authentification sans Sidebar ni TopHeader d'application)
-  const isLandingPage = pathname === '/landing' || (pathname === '/' && !user);
+  const isLandingPage = pathname === '/landing' || pathname === '/';
   const isAuthPage =
     pathname.startsWith('/connexion') ||
     pathname.startsWith('/inscription') ||

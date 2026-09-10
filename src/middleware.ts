@@ -38,13 +38,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // 1. Redirection de la racine (/) vers /connexion pour les visiteurs non connectés
-  if (pathname === '/') {
-    if (!user) {
-      return NextResponse.redirect(new URL('/connexion', request.url));
-    }
-    return supabaseResponse;
-  }
+  // 1. La racine (/) affiche directement la Landing Page (aucune redirection vers /connexion)
 
   // 2. Si déjà connecté et tente d'aller sur /connexion ou /inscription -> retour à l'accueil
   if ((pathname === '/connexion' || pathname === '/inscription') && user) {
@@ -84,7 +78,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',
     '/connexion',
     '/inscription',
     '/mon-compte/:path*',
