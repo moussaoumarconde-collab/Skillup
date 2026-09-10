@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { InstallPwaModal } from '@/components/pwa/InstallPwaModal';
 import {
   ArrowRight,
   BookOpen,
@@ -65,6 +66,7 @@ const FAQ_ITEMS: FaqItem[] = [
 export const LandingPage: React.FC = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(1); // Question 2 ouverte par défaut comme sur la capture 5
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex((prev) => (prev === index ? null : index));
@@ -139,13 +141,14 @@ export const LandingPage: React.FC = () => {
 
           {/* Actions à droite */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/formations"
+            <button
+              type="button"
+              onClick={() => setIsInstallModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <Smartphone className="w-3.5 h-3.5 text-[#5C4DF5]" />
               <span>App Mobile</span>
-            </Link>
+            </button>
 
             <Link
               href="/connexion"
@@ -213,6 +216,17 @@ export const LandingPage: React.FC = () => {
               Nous contacter
             </Link>
             <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsInstallModalOpen(true);
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-50 text-[#5C4DF5] text-sm font-semibold border border-purple-100 cursor-pointer"
+              >
+                <Smartphone className="w-4 h-4" />
+                <span>Installer l&apos;application</span>
+              </button>
               <Link
                 href="/connexion"
                 className="w-full text-center py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-800"
@@ -272,13 +286,14 @@ export const LandingPage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </Link>
 
-            <Link
-              href="/formations"
+            <button
+              type="button"
+              onClick={() => setIsInstallModalOpen(true)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-semibold text-sm sm:text-base px-7 py-4 rounded-2xl shadow-xs active:scale-95 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4 text-gray-500" />
-              <span>Explorer l'application</span>
-            </Link>
+              <Download className="w-4 h-4 text-[#5C4DF5]" />
+              <span>Installer l&apos;application</span>
+            </button>
           </div>
 
           {/* ========================================================================= */}
@@ -707,6 +722,15 @@ export const LandingPage: React.FC = () => {
                     Accéder à mon compte
                   </Link>
                 </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setIsInstallModalOpen(true)}
+                    className="hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    Installer l&apos;application
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -787,6 +811,13 @@ export const LandingPage: React.FC = () => {
 
         </div>
       </footer>
+
+      {/* Modal d'installation PWA et bannière au défilement (iPhone / Android / Desktop) */}
+      <InstallPwaModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        onOpenModal={() => setIsInstallModalOpen(true)}
+      />
 
     </div>
   );
