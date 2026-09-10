@@ -31,16 +31,18 @@ export const TopHeader: React.FC = () => {
 
   // Fermer les notifications lors d'un clic extérieur
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
     };
     if (showNotifications) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [showNotifications]);
 
@@ -184,7 +186,7 @@ export const TopHeader: React.FC = () => {
 
             {/* Menu déroulant des notifications */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-88 bg-white border border-[#F0F2F6] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="fixed left-3 right-3 top-16 max-w-sm mx-auto sm:max-w-none sm:mx-0 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 bg-white border border-[#F0F2F6] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-gray-900">Notifications</span>
