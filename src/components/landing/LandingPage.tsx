@@ -651,14 +651,29 @@ export const LandingPage: React.FC = () => {
           {/* 4 Colonnes du Footer */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             
-            {/* Colonne 1 : Identité SkillUp */}
+            {/* Colonne 1 : Identité SkillUp avec Logo Officiel */}
             <div className="space-y-4">
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00A8B5] to-[#5C4DF5] flex items-center justify-center text-white font-black text-base shadow-md">
-                  S
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-[#5C4DF5]/30 rounded-2xl blur-xs group-hover:bg-[#5C4DF5]/40 transition-all" />
+                  <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[#5C4DF5] to-[#7C6FF6] flex items-center justify-center text-white shadow-md shadow-indigo-950">
+                    <svg
+                      className="w-5 h-5 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
                 </div>
-                <span className="font-extrabold text-xl text-white tracking-tight">
-                  Skill<span className="text-[#00A8B5]">Up</span>
+                <span className="font-extrabold text-2xl text-white tracking-tight">
+                  Skill<span className="text-[#5C4DF5]">Up</span>
                 </span>
               </Link>
               <p className="text-xs text-gray-400 leading-relaxed">
@@ -688,8 +703,8 @@ export const LandingPage: React.FC = () => {
                   </a>
                 </li>
                 <li>
-                  <Link href="/abonnement" className="hover:text-white transition-colors">
-                    Espace Formateur
+                  <Link href="/connexion" className="hover:text-white transition-colors">
+                    Accéder à mon compte
                   </Link>
                 </li>
               </ul>
