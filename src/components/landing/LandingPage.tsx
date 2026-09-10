@@ -531,9 +531,35 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
+      {/* SECTION SOBRE : ACCÈS GRATUIT & CONTENUS SPÉCIALISÉS (2 COULEURS SEULEMENT) */}
+      {/* ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-white border-t border-gray-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4">
+          <span className="text-xs font-black uppercase tracking-widest text-[#5C4DF5]">
+            Accès 100 % gratuit pour démarrer
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+            Apprenez librement. Évoluez sans limites.
+          </h3>
+          <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
+            L&apos;inscription à SkillUp est 100 % gratuite. Vous accédez immédiatement à des formations gratuites pour vous former, ainsi qu&apos;à des cours spécialisés payants selon vos besoins.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/formations"
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#5C4DF5] hover:text-[#4B3CE0] underline underline-offset-4 cursor-pointer transition-colors"
+            >
+              <span>Accéder aux formations et commencer</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
       {/* 5. SECTION FAQ / QUESTIONS FRÉQUENTES (CAPTURE 5) */}
       {/* ========================================================================= */}
-      <section id="faq" className="py-20 md:py-28 bg-white border-t border-gray-100">
+      <section id="faq" className="py-20 md:py-28 bg-[#F8F9FC] border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-12">
           
           {/* En-tête FAQ */}
@@ -587,52 +613,163 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. CALL TO ACTION FINAL & FOOTER */}
+      {/* 6. CALL TO ACTION BANNER (STYLE CAPTURE FOOTER) */}
       {/* ========================================================================= */}
-      <section className="py-16 bg-[#F8F9FC] border-t border-gray-100">
+      <section className="pt-12 pb-16 bg-[#F8F9FC]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <div className="bg-gradient-to-br from-[#5C4DF5] to-[#7C6FF6] rounded-3xl p-8 sm:p-14 text-white space-y-6 shadow-xl shadow-indigo-100">
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-              Prêt à développer vos compétences ?
+          <div className="bg-gradient-to-br from-[#1E1B4B] via-[#2E2880] to-[#1E1B4B] rounded-3xl p-8 sm:p-14 text-white space-y-6 shadow-2xl relative overflow-hidden">
+            
+            {/* Lueur subtile en fond de carte */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#5C4DF5]/30 rounded-full blur-3xl pointer-events-none" />
+
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight relative z-10 max-w-2xl mx-auto leading-snug">
+              Rejoignez des milliers d&apos;apprenants et créateurs qui réussissent avec SkillUp.
             </h2>
-            <p className="text-sm sm:text-base text-indigo-100 max-w-xl mx-auto">
-              Rejoignez des milliers d'apprenants et formateurs sur la première plateforme de formations certifiantes mobile-first.
-            </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+
+            <div className="pt-2 flex flex-col items-center justify-center gap-3 relative z-10">
               <Link
                 href="/inscription"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-[#5C4DF5] font-bold text-sm px-8 py-3.5 rounded-2xl shadow-md hover:bg-gray-50 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#00A8B5] hover:bg-[#00929D] text-white font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-cyan-900/30 active:scale-95 transition-all cursor-pointer"
               >
-                <span>Créer mon compte gratuit</span>
+                <span>Commencer gratuitement</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link
-                href="/formations"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/20 text-white font-semibold text-sm px-7 py-3.5 rounded-2xl transition-all cursor-pointer"
-              >
-                <span>Consulter le catalogue</span>
-              </Link>
+              <p className="text-xs text-gray-300 font-medium">
+                Aucune carte requise · Démarrage en 30 secondes
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer sobre */}
-      <footer className="bg-white border-t border-gray-100 py-10 text-xs text-gray-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#5C4DF5] flex items-center justify-center text-white font-black text-xs">
-              S
+      {/* ========================================================================= */}
+      {/* 7. GRAND FOOTER SOMBRE HAUT DE GAMME AVEC COORDONNÉES RÉELLES */}
+      {/* ========================================================================= */}
+      <footer className="bg-[#0B0D13] text-gray-300 pt-16 pb-10 border-t border-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          
+          {/* 4 Colonnes du Footer */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+            
+            {/* Colonne 1 : Identité SkillUp */}
+            <div className="space-y-4">
+              <Link href="/" className="flex items-center gap-2.5 group">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00A8B5] to-[#5C4DF5] flex items-center justify-center text-white font-black text-base shadow-md">
+                  S
+                </div>
+                <span className="font-extrabold text-xl text-white tracking-tight">
+                  Skill<span className="text-[#00A8B5]">Up</span>
+                </span>
+              </Link>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                La plateforme d&apos;apprentissage et de formations pratiques mobile-first.
+              </p>
             </div>
-            <span className="font-bold text-gray-900">SkillUp</span>
-            <span className="text-gray-400">© 2026. Tous droits réservés.</span>
+
+            {/* Colonne 2 : PRODUIT */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                Produit
+              </h4>
+              <ul className="space-y-2 text-xs text-gray-400">
+                <li>
+                  <a href="#fonctionnalites" className="hover:text-white transition-colors">
+                    Fonctionnalités
+                  </a>
+                </li>
+                <li>
+                  <Link href="/formations" className="hover:text-white transition-colors">
+                    Catalogue de formations
+                  </Link>
+                </li>
+                <li>
+                  <a href="#comment-ca-marche" className="hover:text-white transition-colors">
+                    Comment ça marche
+                  </a>
+                </li>
+                <li>
+                  <Link href="/abonnement" className="hover:text-white transition-colors">
+                    Espace Formateur
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Colonne 3 : RESSOURCES & SUPPORT (COORDONNÉES RÉELLES) */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                Ressources & Support
+              </h4>
+              <ul className="space-y-2 text-xs text-gray-400">
+                <li>
+                  <a href="#faq" className="hover:text-white transition-colors">
+                    FAQ
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:camarayou360@gmail.com"
+                    className="hover:text-[#00A8B5] transition-colors break-all"
+                  >
+                    Support Email (<span className="text-gray-300 underline">camarayou360@gmail.com</span>)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://wa.me/22890286347"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#00A8B5] transition-colors"
+                  >
+                    Nous contacter (Appel & WhatsApp : <span className="text-white font-semibold underline">+228 90 28 63 47</span>)
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Colonne 4 : LÉGAL & CONFIDENTIALITÉ */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                Légal & Confidentialité
+              </h4>
+              <ul className="space-y-2 text-xs text-gray-400">
+                <li>
+                  <Link href="/mentions-legales" className="hover:text-white transition-colors">
+                    Mentions Légales
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cgu" className="hover:text-white transition-colors">
+                    Conditions d&apos;Utilisation (CGU)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/support" className="hover:text-white transition-colors">
+                    Centre d&apos;assistance
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
           </div>
-          <div className="flex items-center gap-6">
-            <a href="#fonctionnalites" className="hover:text-gray-900">Fonctionnalités</a>
-            <a href="#comment-ca-marche" className="hover:text-gray-900">Comment ça marche</a>
-            <a href="#faq" className="hover:text-gray-900">FAQ</a>
-            <Link href="/support" className="hover:text-gray-900">Support</Link>
+
+          {/* Ligne inférieure de Copyright & Contacts directs */}
+          <div className="pt-8 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-400">
+            <div>
+              © 2026 SkillUp. Tous droits réservés.
+            </div>
+            <div className="flex items-center gap-2 flex-wrap text-center sm:text-right">
+              <span>Support direct :</span>
+              <a href="mailto:camarayou360@gmail.com" className="text-gray-300 hover:text-white underline">
+                camarayou360@gmail.com
+              </a>
+              <span>·</span>
+              <a href="tel:+22890286347" className="text-white hover:text-[#00A8B5] font-semibold">
+                +228 90 28 63 47
+              </a>
+            </div>
           </div>
+
         </div>
       </footer>
 

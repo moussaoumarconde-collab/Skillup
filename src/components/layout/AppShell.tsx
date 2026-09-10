@@ -16,13 +16,15 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const router = useRouter();
   const { user, isLoading } = useAuth();
 
-  // Pages autonomes plein écran (Landing page et Authentification sans Sidebar ni TopHeader d'application)
+  // Pages autonomes plein écran (Landing page, Pages légales et Authentification sans Sidebar ni TopHeader d'application)
+  const isLegalPage = pathname.startsWith('/mentions-legales') || pathname.startsWith('/cgu');
   const isLandingPage = pathname === '/landing' || pathname === '/';
   const isAuthPage =
     pathname.startsWith('/connexion') ||
     pathname.startsWith('/inscription') ||
     pathname.startsWith('/mot-de-passe-oublie') ||
-    isLandingPage;
+    isLandingPage ||
+    isLegalPage;
 
   // Routes protégées nécessitant impérativement une authentification en Phase 8B / 9B
   const isProtectedRoute =
