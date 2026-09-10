@@ -17,7 +17,7 @@ import {
   RefreshCw,
   BookOpen,
 } from 'lucide-react';
-import { fetchPublishedCourses } from '@/lib/courses/catalog';
+import { fetchPublishedCourses, getCachedPublishedCourses } from '@/lib/courses/catalog';
 import { Course } from '@/types';
 
 const GRADIENTS = [
@@ -32,32 +32,39 @@ const AUTO_PLAY_MS = 5000;
 
 export const FeaturedCarousel: React.FC = () => {
   const router = useRouter();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [courses, setCourses] = useState<Course[]>(() => getCachedPublishedCourses() || []);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedPublishedCourses());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const initial = getCachedPublishedCourses();
+    return initial && initial.length >= 3 ? 1 : 0;
+  });
 
   const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const isSwiping = useRef<boolean>(false);
 
-  const loadCourses = useCallback(async () => {
-    setIsLoading(true);
+  const loadCourses = useCallback(async (force = false) => {
+    const cached = getCachedPublishedCourses();
+    if (!cached || force) {
+      setIsLoading(true);
+    }
     setErrorMessage(null);
     try {
-      const data = await fetchPublishedCourses();
+      const data = await fetchPublishedCourses(undefined, force);
       setCourses(data);
-      // Si au moins 3 formations, on centre la deuxième pour le confort visuel initial, sinon la première
       if (data.length >= 3) {
-        setCurrentIndex(1);
+        setCurrentIndex((prev) => (prev >= data.length ? 1 : prev));
       } else {
         setCurrentIndex(0);
       }
     } catch (err) {
       console.error('[FeaturedCarousel] Erreur récupération Supabase:', err);
-      setErrorMessage('Impossible de charger les formations en vedette.');
-      setCourses([]);
+      if (!cached) {
+        setErrorMessage('Impossible de charger les formations en vedette.');
+        setCourses([]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -215,7 +222,7 @@ export const FeaturedCarousel: React.FC = () => {
           </p>
           <button
             type="button"
-            onClick={loadCourses}
+            onClick={() => loadCourses(true)}
             className="inline-flex items-center gap-2 text-xs font-semibold text-[#5C4DF5] bg-[#EDE9FE] hover:bg-[#E0DCFE] px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />

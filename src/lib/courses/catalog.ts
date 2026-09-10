@@ -129,14 +129,44 @@ export function mapDbCourseToUI(
   };
 }
 
+// ==============================================================================
+// CACHE MÉMOIRE ULTRA-RAPIDE (Stale-While-Revalidate) POUR CHARGEMENT INSTANTANÉ
+// ==============================================================================
+let _cachedPublishedCourses: Course[] | null = null;
+let _cachedCoursesTimestamp = 0;
+const CACHE_TTL_MS = 60 * 1000; // 1 minute de validité pour affichage en 0ms
+const _courseDetailsCache = new Map<string, { course: Course; timestamp: number }>();
+
+/**
+ * Retourne immédiatement les formations en cache si disponibles (0ms de latence)
+ */
+export function getCachedPublishedCourses(): Course[] | null {
+  return _cachedPublishedCourses;
+}
+
+/**
+ * Invalide le cache lorsque des formations sont ajoutées ou modifiées
+ */
+export function invalidateCoursesCache(): void {
+  _cachedPublishedCourses = null;
+  _cachedCoursesTimestamp = 0;
+  _courseDetailsCache.clear();
+}
+
 /**
  * Récupère la liste de toutes les formations publiées depuis Supabase
- * Règle : Retourne uniquement les formations avec status = 'published'.
+ * Règle : Retourne immédiatement les données en cache (0ms), puis rafraîchit en arrière-plan.
  * Ne renvoie AUCUNE donnée mockée si la base est vide.
  */
 export async function fetchPublishedCourses(
-  customClient?: SupabaseClient
+  customClient?: SupabaseClient,
+  forceRefresh = false
 ): Promise<Course[]> {
+  const now = Date.now();
+  if (!forceRefresh && _cachedPublishedCourses && (now - _cachedCoursesTimestamp < CACHE_TTL_MS)) {
+    return _cachedPublishedCourses;
+  }
+
   try {
     const supabase = customClient || createClient();
 
@@ -209,13 +239,17 @@ export async function fetchPublishedCourses(
     }
 
     // 3. Transformation en objets Course pour l'UI
-    return coursesData.map((course: any) => {
+    const mapped = coursesData.map((course: any) => {
       const instructor = instructorsMap.get(course.instructor_id) || null;
       return mapDbCourseToUI(course as RawDbCourse, instructor);
     });
+
+    _cachedPublishedCourses = mapped;
+    _cachedCoursesTimestamp = Date.now();
+    return mapped;
   } catch (err) {
     console.error('[CatalogService] Exception fetchPublishedCourses:', err);
-    return [];
+    return _cachedPublishedCourses || [];
   }
 }
 
@@ -225,9 +259,25 @@ export async function fetchPublishedCourses(
  */
 export async function fetchPublishedCourseById(
   courseId: string,
-  customClient?: SupabaseClient
+  customClient?: SupabaseClient,
+  forceRefresh = false
 ): Promise<Course | null> {
   if (!courseId) return null;
+
+  const cached = _courseDetailsCache.get(courseId);
+  const now = Date.now();
+  if (!forceRefresh && cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.course;
+  }
+
+  // Vérifier également si disponible dans le cache catalogue global
+  if (!forceRefresh && _cachedPublishedCourses) {
+    const fromGlobal = _cachedPublishedCourses.find((c) => c.id === courseId);
+    if (fromGlobal) {
+      _courseDetailsCache.set(courseId, { course: fromGlobal, timestamp: now });
+      return fromGlobal;
+    }
+  }
 
   try {
     const supabase = customClient || createClient();
@@ -286,7 +336,9 @@ export async function fetchPublishedCourseById(
     }
 
     // 3. Transformation en objet Course
-    return mapDbCourseToUI(courseData as RawDbCourse, instructor);
+    const result = mapDbCourseToUI(courseData as RawDbCourse, instructor);
+    _courseDetailsCache.set(courseId, { course: result, timestamp: Date.now() });
+    return result;
   } catch (err) {
     console.error('[CatalogService] Exception fetchPublishedCourseById:', err);
     return null;

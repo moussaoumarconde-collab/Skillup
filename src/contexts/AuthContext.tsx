@@ -105,9 +105,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .maybeSingle();
 
       if (!error && data) {
-        setProfile(data as Profile);
+        const prof = data as Profile;
+        setProfile(prof);
+        if (user) {
+          saveLocalSession(user, prof);
+        }
         if (typeof document !== 'undefined') {
-          const roleValue = (data as Profile).role || 'student';
+          const roleValue = prof.role || 'student';
           document.cookie = 'skillup_auth_token=true; path=/; max-age=604800; SameSite=Lax';
           document.cookie = `skillup_user_role=${roleValue}; path=/; max-age=604800; SameSite=Lax`;
         }
@@ -119,6 +123,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initializeAuth = async () => {
+      // 1. Restauration optimiste instantanée (0ms) depuis le stockage local
+      if (typeof window !== 'undefined') {
+        try {
+          const localSess = localStorage.getItem(LOCAL_STORAGE_SESSION_KEY);
+          if (localSess) {
+            const parsed = JSON.parse(localSess);
+            if (parsed?.user) {
+              setUser(parsed.user);
+              if (parsed?.profile) setProfile(parsed.profile);
+              setIsLoading(false); // Libère immédiatement l'interface utilisateur
+            }
+          }
+        } catch {
+          // Ignorer
+        }
+      }
+
+      // 2. Vérification asynchrone auprès de Supabase
       try {
         const {
           data: { session: initialSession },
@@ -132,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSession(null);
           setUser(null);
           setProfile(null);
+          clearLocalSession();
         }
       } catch (err) {
         console.warn('[Auth] Erreur initialisation session:', err);

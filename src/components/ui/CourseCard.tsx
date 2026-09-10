@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Clock, Play, BarChart2, ChevronRight, Download, Sparkles } from 'lucide-react';
@@ -23,6 +23,13 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   isHighlighted = false,
 }) => {
   const router = useRouter();
+
+  // Précharger immédiatement la page détaillée du cours en arrière-plan pour navigation instantanée en 1 clic
+  useEffect(() => {
+    if (course?.id) {
+      router.prefetch(`/formations/${course.id}`);
+    }
+  }, [course?.id, router]);
 
   const handleCardClick = () => {
     if (onClick) {

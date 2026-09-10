@@ -82,6 +82,7 @@ export const Sidebar: React.FC = () => {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   active
                     ? 'bg-[#EDE9FE] text-[#5C4DF5] font-semibold'
@@ -113,6 +114,7 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className={`flex items-center gap-3.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${
                     active
                       ? 'bg-[#EDE9FE] text-[#5C4DF5] font-semibold'
@@ -144,6 +146,7 @@ export const Sidebar: React.FC = () => {
           </p>
           <Link
             href="/abonnement"
+            prefetch={true}
             className="mt-3.5 w-full inline-flex items-center justify-center bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
           >
             Voir les tarifs

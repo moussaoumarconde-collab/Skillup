@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Sparkles, CheckCircle2, BookOpen, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
-import { fetchPublishedCourses } from '@/lib/courses/catalog';
+import { fetchPublishedCourses, getCachedPublishedCourses } from '@/lib/courses/catalog';
 import { Course } from '@/types';
 import { CourseCard } from '@/components/ui/CourseCard';
 import { CourseFilters, FilterType, SortType } from '@/components/courses/CourseFilters';
@@ -13,8 +13,9 @@ function FormationsContent() {
   const searchParams = useSearchParams();
   const selectedCourseId = searchParams.get('selected');
 
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Affichage instantané en 0ms si le cache mémoire est disponible
+  const [courses, setCourses] = useState<Course[]>(() => getCachedPublishedCourses() || []);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !getCachedPublishedCourses());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,17 +24,22 @@ function FormationsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
-  // Chargement des formations publiées depuis Supabase
-  const loadCourses = useCallback(async () => {
-    setIsLoading(true);
+  // Chargement des formations publiées depuis Supabase (silencieux si déjà en cache)
+  const loadCourses = useCallback(async (force = false) => {
+    const cached = getCachedPublishedCourses();
+    if (!cached || force) {
+      setIsLoading(true);
+    }
     setErrorMessage(null);
     try {
-      const data = await fetchPublishedCourses();
+      const data = await fetchPublishedCourses(undefined, force);
       setCourses(data);
     } catch (err) {
       console.error('[FormationsPage] Erreur récupération Supabase:', err);
-      setErrorMessage('Une erreur est survenue lors du chargement des formations.');
-      setCourses([]);
+      if (!cached) {
+        setErrorMessage('Une erreur est survenue lors du chargement des formations.');
+        setCourses([]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +187,7 @@ function FormationsContent() {
             </p>
             <button
               type="button"
-              onClick={loadCourses}
+              onClick={() => loadCourses(true)}
               className="inline-flex items-center gap-2 mt-2 text-xs font-semibold text-[#5C4DF5] bg-[#EDE9FE] hover:bg-[#E0DCFE] px-4 py-2 rounded-xl transition-colors cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />

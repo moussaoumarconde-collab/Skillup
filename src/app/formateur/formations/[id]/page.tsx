@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { CourseStatusBadge } from '@/components/instructor/CourseStatusBadge';
 import { PublicationChecklist } from '@/components/instructor/PublicationChecklist';
+import { VideoRecorderModal } from '@/components/instructor/VideoRecorderModal';
 import {
   ArrowLeft,
   Save,
@@ -85,6 +86,10 @@ export default function EditCoursePage() {
   const [newLessonTextContent, setNewLessonTextContent] = useState('');
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [lessonFormError, setLessonFormError] = useState<string | null>(null);
+
+  // Video recorder modal
+  const [isVideoRecorderOpen, setIsVideoRecorderOpen] = useState(false);
+  const [videoTarget, setVideoTarget] = useState<'new' | 'edit'>('new');
 
   // Edit lesson form
   const [editLessonTitle, setEditLessonTitle] = useState('');
@@ -783,8 +788,24 @@ export default function EditCoursePage() {
                                   className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20" />
                               </div>
                               {editLessonType === 'video' ? (
-                                <input type="text" value={editLessonVideoUrl} onChange={(e) => setEditLessonVideoUrl(e.target.value)} placeholder="URL vidéo"
-                                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20" />
+                                <div className="space-y-1.5">
+                                  <div className="flex gap-2 items-center">
+                                    <input type="text" value={editLessonVideoUrl} onChange={(e) => setEditLessonVideoUrl(e.target.value)} placeholder="URL vidéo"
+                                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20" />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setVideoTarget('edit');
+                                        setIsVideoRecorderOpen(true);
+                                      }}
+                                      className="inline-flex items-center gap-1 bg-[#EDE9FE] hover:bg-[#E0DCFE] text-[#5C4DF5] text-xs font-semibold px-2.5 py-2 rounded-lg transition-all cursor-pointer shrink-0"
+                                      title="Créer ou enregistrer une vidéo"
+                                    >
+                                      <Video className="w-3.5 h-3.5" />
+                                      <span>Filmer</span>
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 <textarea rows={3} value={editLessonTextContent} onChange={(e) => setEditLessonTextContent(e.target.value)} placeholder="Contenu texte"
                                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 resize-y" />
@@ -866,16 +887,32 @@ export default function EditCoursePage() {
                             />
                           </div>
                           {newLessonType === 'video' ? (
-                            <input
-                              type="text"
-                              value={newLessonVideoUrl}
-                              onChange={(e) => {
-                                setNewLessonVideoUrl(e.target.value);
-                                if (lessonFormError) setLessonFormError(null);
-                              }}
-                              placeholder="URL de la vidéo (YouTube, Vimeo, lien MP4 direct...)"
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 focus:border-[#5C4DF5] bg-white transition-all"
-                            />
+                            <div className="space-y-1.5">
+                              <div className="flex gap-2 items-center">
+                                <input
+                                  type="text"
+                                  value={newLessonVideoUrl}
+                                  onChange={(e) => {
+                                    setNewLessonVideoUrl(e.target.value);
+                                    if (lessonFormError) setLessonFormError(null);
+                                  }}
+                                  placeholder="URL de la vidéo (YouTube, Vimeo, lien MP4 direct...)"
+                                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#5C4DF5]/20 focus:border-[#5C4DF5] bg-white transition-all"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVideoTarget('new');
+                                    setIsVideoRecorderOpen(true);
+                                  }}
+                                  className="inline-flex items-center gap-1.5 bg-[#EDE9FE] hover:bg-[#E0DCFE] text-[#5C4DF5] text-xs font-semibold px-3 py-2 rounded-xl transition-all cursor-pointer shrink-0 active:scale-95"
+                                  title="Créer ou filmer directement la vidéo de votre leçon"
+                                >
+                                  <Video className="w-3.5 h-3.5" />
+                                  <span>Créer / Filmer</span>
+                                </button>
+                              </div>
+                            </div>
                           ) : (
                             <textarea
                               rows={3}
@@ -1090,7 +1127,21 @@ export default function EditCoursePage() {
         </div>
       )}
 
-      {/* Confirmation suppression overlay */}
+      {/* Modal studio d'enregistrement et création vidéo */}
+      <VideoRecorderModal
+        isOpen={isVideoRecorderOpen}
+        onClose={() => setIsVideoRecorderOpen(false)}
+        onVideoReady={(url, duration) => {
+          if (videoTarget === 'edit') {
+            setEditLessonVideoUrl(url);
+            if (duration && !editLessonDuration) setEditLessonDuration(duration);
+          } else {
+            setNewLessonVideoUrl(url);
+            if (duration) setNewLessonDuration(duration);
+          }
+          setIsVideoRecorderOpen(false);
+        }}
+      />
     </div>
   );
 }
