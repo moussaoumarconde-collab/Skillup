@@ -18,7 +18,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   // Pages autonomes plein écran (Landing page, Pages légales et Authentification sans Sidebar ni TopHeader d'application)
   const isLegalPage = pathname.startsWith('/mentions-legales') || pathname.startsWith('/cgu');
-  const isLandingPage = pathname === '/landing' || pathname === '/';
+  const isLandingPage = pathname === '/landing';
   const isAuthPage =
     pathname.startsWith('/connexion') ||
     pathname.startsWith('/inscription') ||
