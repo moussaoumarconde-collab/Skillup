@@ -29,7 +29,7 @@ export const BottomNav: React.FC = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F0F2F6] px-4 py-2 flex items-center justify-around md:hidden shadow-[0_-4px_25px_rgba(0,0,0,0.04)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F0F2F6] px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around md:hidden shadow-[0_-4px_25px_rgba(0,0,0,0.04)]">
       {bottomNavItems.map((item) => {
         const active = isItemActive(item.href);
         const Icon = item.icon;
