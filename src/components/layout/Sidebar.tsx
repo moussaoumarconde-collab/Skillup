@@ -11,6 +11,7 @@ import {
   Settings,
   HelpCircle,
   Crown,
+  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -47,10 +48,10 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 h-screen bg-white border-r border-[#F0F2F6] flex flex-col justify-between p-5 select-none shrink-0 sticky top-0">
+    <aside className="w-64 h-screen max-h-screen bg-white border-r border-[#F0F2F6] flex flex-col justify-between p-4 sm:p-5 select-none shrink-0 sticky top-0 overflow-y-auto">
       {/* Brand Header */}
       <div>
-        <Link href="/" className="flex items-center gap-3 px-2 py-1 mb-6 group">
+        <Link href="/" className="flex items-center gap-3 px-2 py-1 mb-4 group">
           <div className="w-9 h-9 rounded-xl bg-[#5C4DF5] flex items-center justify-center text-white shadow-sm shadow-indigo-200 group-hover:scale-105 transition-transform">
             {/* SkillUp geometric swirl logo */}
             <svg
@@ -101,7 +102,7 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Section: AUTRE */}
-        <div className="mt-7">
+        <div className="mt-5">
           <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
             Autre
           </p>
@@ -134,22 +135,43 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Card: Abonnement Formateur & Tarifs (affiché uniquement pour les formateurs et admins) */}
+      {/* Card: Espace Formateur (affiché uniquement pour les formateurs et admins) */}
       {isInstructor && (
-        <div className="bg-[#F8F7FF] border border-[#ECEAFE] rounded-2xl p-4 text-left relative overflow-hidden mt-4">
-          <div className="w-8 h-8 rounded-lg bg-purple-100/70 flex items-center justify-center mb-2.5">
-            <Crown className="w-4 h-4 text-[#5C4DF5]" />
+        <div className="bg-gradient-to-b from-[#F8F7FF] to-[#F1EFFF] border border-[#ECEAFE] rounded-2xl p-3.5 text-left relative overflow-hidden mt-3 shrink-0 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-purple-100/80 flex items-center justify-center shrink-0">
+                <Crown className="w-3.5 h-3.5 text-[#5C4DF5]" />
+              </div>
+              <h4 className="font-bold text-xs sm:text-sm text-gray-900 leading-tight">
+                Espace Formateur
+              </h4>
+            </div>
+            <Link
+              href="/abonnement"
+              prefetch={true}
+              className="text-[11px] font-semibold text-[#5C4DF5] hover:underline"
+              title="Consulter les formules et tarifs"
+            >
+              Tarifs
+            </Link>
           </div>
-          <h4 className="font-bold text-sm text-gray-900">Espace Formateur</h4>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            Consultez nos formules d'abonnement pour publier vos cours.
+
+          <p className="text-[11px] text-gray-500 mb-3 leading-relaxed">
+            Gérez vos formations, consultez vos revenus et vos leçons.
           </p>
+
           <Link
-            href="/abonnement"
+            href="/formateur"
             prefetch={true}
-            className="mt-3.5 w-full inline-flex items-center justify-center bg-[#5C4DF5] hover:bg-[#4B3CE0] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+            className={`w-full inline-flex items-center justify-center gap-1.5 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer ${
+              pathname.startsWith('/formateur')
+                ? 'bg-[#4B3CE0] ring-2 ring-[#5C4DF5]/30'
+                : 'bg-[#5C4DF5] hover:bg-[#4B3CE0]'
+            }`}
           >
-            Voir les tarifs
+            <span>Accéder à mon espace</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       )}
