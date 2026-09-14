@@ -13,7 +13,7 @@ export const TopHeader: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  const [notifications, setNotifications] = useState([
+  const INITIAL_NOTIFICATIONS = [
     {
       id: 'notif_1',
       title: 'Bienvenue sur SkillUp',
@@ -21,12 +21,75 @@ export const TopHeader: React.FC = () => {
       time: 'Récemment',
       read: false,
     },
-  ]);
+  ];
+
+  const storageKey = user?.id
+    ? `skillup_read_notifications_${user.id}`
+    : 'skillup_read_notifications_guest';
+
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+
+  // Charger les statuts de lecture persistés dans localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          const readIds: string[] = JSON.parse(raw);
+          if (Array.isArray(readIds)) {
+            setNotifications((prev) =>
+              prev.map((n) => ({
+                ...n,
+                read: readIds.includes(n.id),
+              }))
+            );
+          }
+        }
+      } catch (err) {
+        console.error('[Notifications] Erreur chargement localStorage:', err);
+      }
+    }
+  }, [storageKey]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      if (typeof window !== 'undefined') {
+        try {
+          const allIds = updated.map((n) => n.id);
+          localStorage.setItem(storageKey, JSON.stringify(allIds));
+        } catch (err) {
+          console.error('[Notifications] Erreur sauvegarde localStorage:', err);
+        }
+      }
+      return updated;
+    });
+  };
+
+  const markNotificationAsRead = (id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      if (typeof window !== 'undefined') {
+        try {
+          const readIds = updated.filter((n) => n.read).map((n) => n.id);
+          localStorage.setItem(storageKey, JSON.stringify(readIds));
+        } catch (err) {
+          console.error('[Notifications] Erreur sauvegarde localStorage:', err);
+        }
+      }
+      return updated;
+    });
+  };
+
+  const handleToggleNotifications = () => {
+    const nextState = !showNotifications;
+    setShowNotifications(nextState);
+    // Dès que l'utilisateur ouvre pour voir les notifications, les marquer comme lues
+    if (nextState && unreadCount > 0) {
+      markAllAsRead();
+    }
   };
 
   // Fermer les notifications lors d'un clic extérieur
@@ -168,7 +231,7 @@ export const TopHeader: React.FC = () => {
           <div className="relative" ref={notifRef}>
             <button
               type="button"
-              onClick={() => setShowNotifications((prev) => !prev)}
+              onClick={handleToggleNotifications}
               className={`relative w-10 h-10 rounded-xl bg-white border items-center justify-center transition-colors shadow-xs cursor-pointer flex ${
                 showNotifications
                   ? 'border-[#5C4DF5] text-[#5C4DF5]'
@@ -217,15 +280,23 @@ export const TopHeader: React.FC = () => {
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        className={`py-3 px-1 transition-colors ${
-                          !n.read ? 'bg-purple-50/40 rounded-xl' : ''
+                        onClick={() => markNotificationAsRead(n.id)}
+                        className={`py-3 px-2.5 rounded-xl transition-colors cursor-pointer ${
+                          !n.read ? 'bg-purple-50/50' : 'hover:bg-gray-50/80'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-xs font-bold text-gray-800">{n.title}</p>
-                          <span className="text-[10px] text-gray-400">{n.time}</span>
+                          <div className="flex items-center gap-1.5">
+                            {!n.read && (
+                              <span className="w-2 h-2 rounded-full bg-[#5C4DF5] shrink-0" />
+                            )}
+                            <p className={`text-xs font-bold ${!n.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                              {n.title}
+                            </p>
+                          </div>
+                          <span className="text-[10px] text-gray-400 shrink-0">{n.time}</span>
                         </div>
-                        <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+                        <p className="text-[11px] text-gray-500 mt-1 leading-relaxed pl-3.5">
                           {n.description}
                         </p>
                       </div>
